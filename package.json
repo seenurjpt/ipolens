@@ -1,0 +1,20 @@
+{
+  "name": "ipolens",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "turbo run dev --filter=@ipolens/api --filter=@ipolens/worker --filter=@ipolens/mobile",
+    "dev:admin": "turbo run dev --filter=@ipolens/admin",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0"
+  }
+}
