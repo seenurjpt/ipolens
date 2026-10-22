@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "turbo run dev --filter=@ipolens/api --filter=@ipolens/worker --filter=@ipolens/mobile",
     "dev:admin": "turbo run dev --filter=@ipolens/admin",
+    "dev:demo": "pnpm --filter @ipolens/api dev:memory",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "db:up": "docker compose up -d",
-    "db:down": "docker compose down"
+    "db:down": "docker compose down",
+    "db:seed": "pnpm --filter @ipolens/api seed"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

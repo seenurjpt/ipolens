@@ -1,8 +1,17 @@
+import { Redis } from 'ioredis';
 import mongoose from 'mongoose';
 import { buildApp } from './app';
 import { env } from './env';
+import { redisSubscriptionCache } from './services/subscription-cache';
 
-const app = buildApp();
+// Fail fast instead of queueing commands while Redis is down; reads fall back to MongoDB.
+const redis = new Redis(env.REDIS_URL, { maxRetriesPerRequest: 1, enableOfflineQueue: false });
+
+const app = buildApp({
+  redis,
+  subscriptionCache: redisSubscriptionCache(redis, (err) => app.log.warn({ err }, 'subscription cache read failed')),
+});
+redis.on('error', (err) => app.log.warn({ err: err.message }, 'redis error'));
 
 try {
   await mongoose.connect(env.MONGODB_URI);

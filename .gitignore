@@ -9,3 +9,6 @@ web-build/
 .env.*.local
 coverage/
 raw-archive/
+
+# Skia web runtime, copied on install (apps/mobile/scripts/copy-canvaskit.js)
+apps/mobile/public/canvaskit.wasm
