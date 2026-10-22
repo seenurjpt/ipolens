@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 import { biddingEndsAt, formatCountdown, formatDay, formatPriceBand, formatRupees } from '@/lib/format';
 
 import { BoardTag, GainText, MultipleText, StatusChip } from './badges';
+import { Glass } from './glass/glass';
 import { IpoLogo } from './ipo-logo';
 import { Text } from './ui/text';
 
@@ -52,30 +53,30 @@ function Headline({ ipo }: { ipo: IpoCardData }) {
 export function IpoCard({ ipo, now }: { ipo: IpoCardData; now: number }) {
   return (
     <Link href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
-      <Pressable
-        accessibilityRole="link"
-        className="rounded-2xl border border-line bg-surface p-4 active:opacity-80 dark:border-line-dark dark:bg-surface-dark">
-        <View className="flex-row items-center gap-3">
-          <IpoLogo name={ipo.name} logoUrl={ipo.logoUrl} />
-          <View className="flex-1 gap-1">
-            <View className="flex-row items-center gap-1.5">
-              <Text variant="title" numberOfLines={1} className="shrink">
-                {ipo.name}
-              </Text>
-              <BoardTag board={ipo.board} />
+      <Pressable accessibilityRole="link" className="active:opacity-80">
+        <Glass className="p-4">
+          <View className="flex-row items-center gap-3">
+            <IpoLogo name={ipo.name} logoUrl={ipo.logoUrl} />
+            <View className="flex-1 gap-1">
+              <View className="flex-row items-center gap-1.5">
+                <Text variant="title" numberOfLines={1} className="shrink">
+                  {ipo.name}
+                </Text>
+                <BoardTag board={ipo.board} />
+              </View>
+              <View className="flex-row items-center gap-2">
+                <StatusChip status={ipo.status} />
+                <Text variant="caption">{dateLine(ipo, now)}</Text>
+              </View>
             </View>
-            <View className="flex-row items-center gap-2">
-              <StatusChip status={ipo.status} />
-              <Text variant="caption">{dateLine(ipo, now)}</Text>
-            </View>
+            <Headline ipo={ipo} />
           </View>
-          <Headline ipo={ipo} />
-        </View>
-        <View className="mt-3 flex-row border-t border-line pt-3 dark:border-line-dark">
-          <Stat label="Price band" value={formatPriceBand(ipo.priceBand)} />
-          <Stat label="Min. investment" value={formatRupees(ipo.minInvestmentPaise)} />
-          <Stat label="Lot" value={`${ipo.lotSize} shares`} />
-        </View>
+          <View className="mt-3 flex-row border-t border-line pt-3 dark:border-line-dark">
+            <Stat label="Price band" value={formatPriceBand(ipo.priceBand)} />
+            <Stat label="Min. investment" value={formatRupees(ipo.minInvestmentPaise)} />
+            <Stat label="Lot" value={`${ipo.lotSize} shares`} />
+          </View>
+        </Glass>
       </Pressable>
     </Link>
   );

@@ -7,6 +7,7 @@ import { CartesianChart, Line } from 'victory-native';
 import { formatDayTime, isSameIstDay } from '@/lib/format';
 import { CATEGORY_COLORS, usePalette } from '@/lib/theme';
 
+import { Glass } from '../glass/glass';
 import { Text } from '../ui/text';
 
 type SeriesKey = 'qib' | 'nii' | 'retail' | 'total';
@@ -45,7 +46,7 @@ export default function SubscriptionChart({ history }: SubscriptionChartProps) {
   };
 
   return (
-    <View className="rounded-2xl border border-line bg-surface p-3 dark:border-line-dark dark:bg-surface-dark">
+    <Glass className="p-3">
       <View style={{ height: 220 }}>
         <CartesianChart
           data={data}
@@ -54,7 +55,9 @@ export default function SubscriptionChart({ history }: SubscriptionChartProps) {
           padding={{ left: 4, right: 8, top: 8, bottom: 4 }}
           domain={{ y: [0] }}
           xAxis={{ font, tickCount: 4, labelColor: palette.muted, lineColor: palette.line, formatXLabel: xLabel }}
-          yAxis={[{ font, tickCount: 5, labelColor: palette.muted, lineColor: palette.line, formatYLabel: (v) => `${v}x` }]}>
+          yAxis={[
+            { font, tickCount: 5, labelColor: palette.muted, lineColor: palette.line, formatYLabel: (v) => `${v}x` },
+          ]}>
           {({ points }) =>
             SERIES.map((s) => (
               <Line
@@ -76,6 +79,6 @@ export default function SubscriptionChart({ history }: SubscriptionChartProps) {
           </View>
         ))}
       </View>
-    </View>
+    </Glass>
   );
 }

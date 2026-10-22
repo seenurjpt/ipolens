@@ -11,10 +11,16 @@ import { Text } from './ui/text';
 const QUICK_LABELS = ['Self', 'Spouse', 'Mom', 'Dad', 'Child'];
 
 const inputClass =
-  'rounded-xl border border-line bg-surface px-3 py-3 font-sans text-base text-ink dark:border-line-dark dark:bg-surface-dark dark:text-ink-dark';
+  'rounded-2xl border border-rim bg-strong px-4 py-3 font-sans text-base text-ink dark:border-rim-dark dark:bg-strong-dark dark:text-ink-dark';
 
 /** Label + PAN + consent, saved on this device only. Calls onSaved with the new PAN's id. */
-export function PanForm({ onSaved, submitLabel = 'Save PAN' }: { onSaved: (panId: string) => void; submitLabel?: string }) {
+export function PanForm({
+  onSaved,
+  submitLabel = 'Save PAN',
+}: {
+  onSaved: (panId: string) => void;
+  submitLabel?: string;
+}) {
   const palette = usePalette();
   const [label, setLabel] = useState('');
   const [pan, setPan] = useState('');
@@ -74,12 +80,16 @@ export function PanForm({ onSaved, submitLabel = 'Save PAN' }: { onSaved: (panId
         />
       </View>
 
-      <View className="gap-2 rounded-xl bg-canvas p-3 dark:bg-canvas-dark">
+      <View className="gap-2 rounded-2xl border border-rim bg-canvas p-3 dark:border-rim-dark dark:bg-canvas-dark">
         <Text variant="caption" className="leading-4">
           Your PAN is used only to fill the PAN box on the registrar&apos;s allotment page. It is stored encrypted on
           this device and is never sent to IPOLens servers. You can delete it any time in Settings.
         </Text>
-        <CheckRow label="I agree to store this PAN on this device" checked={consent} onToggle={() => setConsent((c) => !c)} />
+        <CheckRow
+          label="I agree to store this PAN on this device"
+          checked={consent}
+          onToggle={() => setConsent((c) => !c)}
+        />
       </View>
 
       {error ? (
@@ -88,7 +98,12 @@ export function PanForm({ onSaved, submitLabel = 'Save PAN' }: { onSaved: (panId
         </Text>
       ) : null}
 
-      <Button label={submitLabel} onPress={save} busy={busy} disabled={!consent || pan.length !== 10 || !label.trim()} />
+      <Button
+        label={submitLabel}
+        onPress={save}
+        busy={busy}
+        disabled={!consent || pan.length !== 10 || !label.trim()}
+      />
     </View>
   );
 }

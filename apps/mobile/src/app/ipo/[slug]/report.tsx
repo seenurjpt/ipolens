@@ -3,6 +3,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 
+import { useContentInsets } from '@/components/glass/layout';
 import { ScoreBreakdown, ScoreRing } from '@/components/score';
 import { Empty, ErrorState, Loading } from '@/components/screen-state';
 import { Card, Row } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import { useReport } from '@/lib/queries';
 type Point = AiReport['pros'][number];
 
 export default function ReportScreen() {
+  const insets = useContentInsets();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const query = useReport(slug);
 
@@ -21,7 +23,8 @@ export default function ReportScreen() {
   const { report } = query.data;
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top, paddingBottom: insets.bottom, gap: 16 }}>
       <Card>
         <View className="flex-row items-center gap-4">
           <ScoreRing total={report.score.total} size={104} />
@@ -117,8 +120,13 @@ function Financials({ rows }: { rows: AiReport['financials'] }) {
           {rows.map((r) => {
             const v = r[c.key] as number;
             return (
-              <Text key={r.fy} variant="label" className={`w-16 text-right ${v < 0 ? 'text-loss dark:text-loss-dark' : ''}`}>
-                {c.pct ? `${v.toFixed(1)}%` : v.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+              <Text
+                key={r.fy}
+                variant="label"
+                className={`w-16 text-right ${v < 0 ? 'text-loss dark:text-loss-dark' : ''}`}>
+                {c.pct
+                  ? `${v.toFixed(1)}%`
+                  : v.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
               </Text>
             );
           })}
@@ -158,7 +166,9 @@ function PointRow({ point, dot }: { point: Point; dot: string }) {
           accessibilityLabel={`Evidence on page ${point.evidence.page}`}
           onPress={() => setOpen((o) => !o)}
           className="self-start rounded-md bg-brand-soft px-2 py-0.5 active:opacity-70 dark:bg-brand-soft-dark">
-          <Text className="font-sans-semibold text-[11px] text-brand dark:text-brand-dark">page {point.evidence.page}</Text>
+          <Text className="font-sans-semibold text-[11px] text-brand dark:text-brand-dark">
+            page {point.evidence.page}
+          </Text>
         </Pressable>
         {open ? (
           <Text variant="caption" className="border-l-2 border-line pl-2 italic dark:border-line-dark">

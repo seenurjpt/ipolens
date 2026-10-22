@@ -80,9 +80,10 @@ export function Chip({ label, selected, onPress }: { label: string; selected: bo
       className={`rounded-full border px-3 py-1.5 ${
         selected
           ? 'border-brand bg-brand-soft dark:border-brand-dark dark:bg-brand-soft-dark'
-          : 'border-line bg-surface dark:border-line-dark dark:bg-surface-dark'
+          : 'border-rim bg-canvas dark:border-rim-dark dark:bg-canvas-dark'
       }`}>
-      <Text className={`font-sans-medium text-xs ${selected ? 'text-brand dark:text-brand-dark' : 'text-ink dark:text-ink-dark'}`}>
+      <Text
+        className={`font-sans-medium text-xs ${selected ? 'text-brand dark:text-brand-dark' : 'text-ink dark:text-ink-dark'}`}>
         {label}
       </Text>
     </Pressable>
@@ -110,7 +111,7 @@ export function Stepper({
       accessibilityLabel={`${icon === 'minus' ? 'Fewer' : 'More'} ${label}`}
       disabled={disabled}
       onPress={() => onChange(next)}
-      className={`h-10 w-10 items-center justify-center rounded-xl border border-line dark:border-line-dark ${disabled ? 'opacity-40' : 'active:opacity-70'}`}>
+      className={`h-10 w-10 items-center justify-center rounded-full border border-rim bg-strong dark:border-rim-dark dark:bg-strong-dark ${disabled ? 'opacity-40' : 'active:opacity-70'}`}>
       <MaterialCommunityIcons name={icon} size={18} color={palette.ink} />
     </Pressable>
   );

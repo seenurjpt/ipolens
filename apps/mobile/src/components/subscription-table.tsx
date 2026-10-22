@@ -2,6 +2,7 @@ import type { IpoInput, SubscriptionFigures } from '@ipolens/shared';
 import { View } from 'react-native';
 
 import { MultipleText } from './badges';
+import { Glass } from './glass/glass';
 import { Text } from './ui/text';
 
 interface Row {
@@ -32,7 +33,7 @@ export function SubscriptionTable({
   ];
 
   return (
-    <View className="overflow-hidden rounded-2xl border border-line bg-surface dark:border-line-dark dark:bg-surface-dark">
+    <Glass>
       <View className="flex-row bg-canvas px-4 py-2 dark:bg-canvas-dark">
         <Text variant="caption" className="flex-1">
           Category
@@ -49,7 +50,7 @@ export function SubscriptionTable({
         .map((r) => (
           <View
             key={r.label}
-            className={`flex-row items-center border-t border-line px-4 py-2.5 dark:border-line-dark ${r.strong ? 'bg-canvas/50 dark:bg-canvas-dark/50' : ''}`}>
+            className={`flex-row items-center border-t border-line px-4 py-2.5 dark:border-line-dark ${r.strong ? 'bg-canvas dark:bg-canvas-dark' : ''}`}>
             <Text
               variant={r.strong ? 'title' : r.indent ? 'caption' : 'label'}
               className={`flex-1 ${r.indent ? 'pl-3' : ''}`}>
@@ -63,6 +64,6 @@ export function SubscriptionTable({
             </View>
           </View>
         ))}
-    </View>
+    </Glass>
   );
 }

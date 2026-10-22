@@ -4,6 +4,9 @@ import { Link } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 
+import { Glass } from '@/components/glass/glass';
+import { HeroCard } from '@/components/glass/hero';
+import { useContentInsets } from '@/components/glass/layout';
 import { StatusChip } from '@/components/badges';
 import { IpoLogo } from '@/components/ipo-logo';
 import { ErrorState, Loading } from '@/components/screen-state';
@@ -26,6 +29,7 @@ const GROUPS: { title: string; match: (ipo: Ipo, apps: Application[]) => boolean
 ];
 
 export default function MyIposScreen() {
+  const insets = useContentInsets({ tabBar: true });
   const palette = usePalette();
   const applications = useAppStore((s) => s.applications);
   const pans = useAppStore((s) => s.pans);
@@ -57,22 +61,26 @@ export default function MyIposScreen() {
     const ipo = ipos.bySlug.get(a.slug);
     return sum + ((ipo && listingPnlPaise(a, ipo)) ?? 0);
   }, 0);
-  const listedAllotted = applications.filter((a) => ipos.bySlug.get(a.slug)?.listing && a.allotment === 'ALLOTTED').length;
+  const listedAllotted = applications.filter(
+    (a) => ipos.bySlug.get(a.slug)?.listing && a.allotment === 'ALLOTTED',
+  ).length;
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 20 }}
-      refreshControl={<RefreshControl refreshing={false} onRefresh={() => void ipos.refetch()} tintColor={palette.brand} />}>
-      <View className="gap-1 rounded-2xl bg-brand p-4 dark:bg-brand-soft-dark">
-        <Text className="font-sans-medium text-sm text-white/80 dark:text-ink-dark/80">Listing-day P&amp;L</Text>
-        <Text className="font-sans-bold text-3xl text-white dark:text-ink-dark">
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top, paddingBottom: insets.bottom, gap: 20 }}
+      refreshControl={
+        <RefreshControl refreshing={false} onRefresh={() => void ipos.refetch()} tintColor={palette.brand} />
+      }>
+      <HeroCard className="gap-1 p-5">
+        <Text className="font-sans-medium text-sm text-white/80">Listing-day P&amp;L</Text>
+        <Text className="font-sans-bold text-3xl text-white">
           {listedAllotted === 0 ? 'Nothing listed yet' : `${pnl >= 0 ? '+' : '−'}${formatRupees(Math.abs(pnl))}`}
         </Text>
-        <Text className="text-xs text-white/80 dark:text-ink-dark/70">
-          {applications.length} application{applications.length === 1 ? '' : 's'} · {listedAllotted} allotted and listed ·
-          at listing price
+        <Text className="text-xs text-white/80">
+          {applications.length} application{applications.length === 1 ? '' : 's'} · {listedAllotted} allotted and listed
+          · at listing price
         </Text>
-      </View>
+      </HeroCard>
 
       {sections.map((section) => (
         <View key={section.title} className="gap-3">
@@ -89,7 +97,7 @@ export default function MyIposScreen() {
 function AppliedIpoCard({ ipo, apps, panLabel }: { ipo: Ipo; apps: Application[]; panLabel: Map<string, string> }) {
   const needsCheck = apps.some((a) => awaitsAllotmentCheck(a, ipo));
   return (
-    <View className="gap-3 rounded-2xl border border-line bg-surface p-4 dark:border-line-dark dark:bg-surface-dark">
+    <Glass className="gap-3 p-4">
       <Link href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
         <Pressable className="flex-row items-center gap-3 active:opacity-70">
           <IpoLogo name={ipo.name} logoUrl={ipo.logoUrl} />
@@ -120,7 +128,7 @@ function AppliedIpoCard({ ipo, apps, panLabel }: { ipo: Ipo; apps: Application[]
           <Button label="Check allotment" />
         </Link>
       ) : null}
-    </View>
+    </Glass>
   );
 }
 
@@ -138,7 +146,8 @@ function ApplicationLine({ app, ipo, label }: { app: Application; ipo: Ipo; labe
       <View className="items-end gap-0.5">
         <AllotmentChip app={app} />
         {pnl !== null ? (
-          <Text className={`font-sans-semibold text-sm ${pnl >= 0 ? 'text-over dark:text-over-dark' : 'text-loss dark:text-loss-dark'}`}>
+          <Text
+            className={`font-sans-semibold text-sm ${pnl >= 0 ? 'text-over dark:text-over-dark' : 'text-loss dark:text-loss-dark'}`}>
             {pnl >= 0 ? '+' : '−'}
             {formatRupees(Math.abs(pnl))}
           </Text>
@@ -151,7 +160,11 @@ function ApplicationLine({ app, ipo, label }: { app: Application; ipo: Ipo; labe
 function AllotmentChip({ app }: { app: Application }) {
   const styles = {
     ALLOTTED: { label: 'Allotted', box: 'bg-over-soft dark:bg-over-soft-dark', text: 'text-over dark:text-over-dark' },
-    NOT_ALLOTTED: { label: 'Not allotted', box: 'bg-canvas dark:bg-canvas-dark', text: 'text-muted dark:text-muted-dark' },
+    NOT_ALLOTTED: {
+      label: 'Not allotted',
+      box: 'bg-canvas dark:bg-canvas-dark',
+      text: 'text-muted dark:text-muted-dark',
+    },
     UNKNOWN: { label: 'Result pending', box: 'bg-canvas dark:bg-canvas-dark', text: 'text-muted dark:text-muted-dark' },
   }[app.allotment];
   return (
@@ -172,8 +185,8 @@ function EmptyState() {
         Track your applications
       </Text>
       <Text variant="caption" className="text-center text-sm leading-5">
-        Tap &quot;Mark as applied&quot; on any IPO to track it here, across your family&apos;s PANs, with allotment results
-        and listing-day gains.
+        Tap &quot;Mark as applied&quot; on any IPO to track it here, across your family&apos;s PANs, with allotment
+        results and listing-day gains.
       </Text>
       <Link href="/ipos" asChild>
         <Button label="Browse IPOs" className="mt-2 self-stretch" />

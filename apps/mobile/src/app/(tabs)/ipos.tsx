@@ -7,6 +7,7 @@ import { ActivityIndicator, RefreshControl, TextInput, View } from 'react-native
 import { IpoCard } from '@/components/ipo-card';
 import { Empty, ErrorState, Loading } from '@/components/screen-state';
 import { FilterChips, SegmentedControl } from '@/components/segmented-control';
+import { useContentInsets } from '@/components/glass/layout';
 import { useNow } from '@/hooks/use-now';
 import { useIpoPages } from '@/lib/queries';
 import { usePalette } from '@/lib/theme';
@@ -46,6 +47,7 @@ function useDebounced<T>(value: T, ms: number): T {
 export default function ExploreScreen() {
   const palette = usePalette();
   const now = useNow();
+  const insets = useContentInsets({ tabBar: true });
   const [segment, setSegment] = useState<Segment>('open');
   const [board, setBoard] = useState<Board | 'ALL'>('ALL');
   const [search, setSearch] = useState('');
@@ -60,8 +62,8 @@ export default function ExploreScreen() {
 
   return (
     <View className="flex-1">
-      <View className="gap-3 px-4 pb-3 pt-1">
-        <View className="flex-row items-center gap-2 rounded-xl border border-line bg-surface px-3 dark:border-line-dark dark:bg-surface-dark">
+      <View className="gap-3 px-4 pb-3" style={{ paddingTop: insets.top }}>
+        <View className="flex-row items-center gap-2 rounded-full border border-rim bg-strong px-4 dark:border-rim-dark dark:bg-strong-dark">
           <MaterialCommunityIcons name="magnify" size={18} color={palette.muted} />
           <TextInput
             value={search}
@@ -86,17 +88,23 @@ export default function ExploreScreen() {
           data={items}
           keyExtractor={(i) => i._id}
           renderItem={({ item }) => <IpoCard ipo={item} now={now.getTime()} />}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom }}
           ItemSeparatorComponent={() => <View className="h-3" />}
           onEndReached={() => query.hasNextPage && !query.isFetchingNextPage && query.fetchNextPage()}
           onEndReachedThreshold={0.5}
           refreshControl={
-            <RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} tintColor={palette.brand} />
+            <RefreshControl
+              refreshing={query.isRefetching}
+              onRefresh={() => void query.refetch()}
+              tintColor={palette.brand}
+            />
           }
           ListEmptyComponent={
             <Empty title={q ? `Nothing matches "${q}"` : 'No IPOs here yet'} note="Try another tab or filter." />
           }
-          ListFooterComponent={query.isFetchingNextPage ? <ActivityIndicator className="py-4" color={palette.brand} /> : null}
+          ListFooterComponent={
+            query.isFetchingNextPage ? <ActivityIndicator className="py-4" color={palette.brand} /> : null
+          }
         />
       )}
     </View>

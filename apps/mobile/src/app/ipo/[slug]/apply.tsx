@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
+import { useContentInsets } from '@/components/glass/layout';
 import { ErrorState, Loading } from '@/components/screen-state';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,6 +25,7 @@ export default function ApplyScreen() {
 }
 
 function ApplyForm({ ipo }: { ipo: Ipo }) {
+  const insets = useContentInsets();
   const pans = useAppStore((s) => s.pans);
   const saveApplications = useAppStore((s) => s.saveApplications);
   const existing = useAppStore(useShallow((s) => s.applications.filter((a) => a.ipoId === ipo._id)));
@@ -57,7 +59,8 @@ function ApplyForm({ ipo }: { ipo: Ipo }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top, paddingBottom: insets.bottom, gap: 16 }}>
       <Text variant="heading">{ipo.name}</Text>
 
       <Card title="Applied with">
@@ -65,7 +68,13 @@ function ApplyForm({ ipo }: { ipo: Ipo }) {
           <Text variant="caption">Add a PAN to track whose application this is.</Text>
         ) : (
           pans.map((p) => (
-            <CheckRow key={p.id} label={p.label} note={maskPan(p.last4)} checked={selected.has(p.id)} onToggle={() => toggle(p.id)} />
+            <CheckRow
+              key={p.id}
+              label={p.label}
+              note={maskPan(p.last4)}
+              checked={selected.has(p.id)}
+              onToggle={() => toggle(p.id)}
+            />
           ))
         )}
         <Link href="/pans/add" asChild>

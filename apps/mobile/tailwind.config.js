@@ -6,17 +6,32 @@ module.exports = {
   theme: {
     extend: {
       // Pair every light token with its `-dark` twin and use both: `bg-surface dark:bg-surface-dark`.
+      // Glass design: screens sit on a gradient backdrop (components/backdrop.tsx), so surfaces
+      // are translucent. rgba tokens don't take opacity modifiers (`/50`); add a token instead.
+      // Keep in sync with src/lib/theme.ts.
       colors: {
-        canvas: { DEFAULT: '#F4F5F7', dark: '#0B0D10' },
-        surface: { DEFAULT: '#FFFFFF', dark: '#15181D' },
-        line: { DEFAULT: '#E4E7EC', dark: '#262A31' },
-        ink: { DEFAULT: '#101828', dark: '#ECEEF1' },
-        muted: { DEFAULT: '#667085', dark: '#98A2B3' },
-        brand: { DEFAULT: '#3355E0', dark: '#7B93FF', soft: '#EBEFFD', 'soft-dark': '#1C2445' },
+        // Solid backdrop base, for navigation containers and transitions.
+        base: { DEFAULT: '#EEF1FF', dark: '#080B1E' },
+        // Glass panels (cards) and stronger glass (inputs, controls, selected pills).
+        surface: { DEFAULT: 'rgba(255,255,255,0.58)', dark: 'rgba(255,255,255,0.075)' },
+        strong: { DEFAULT: 'rgba(255,255,255,0.82)', dark: 'rgba(255,255,255,0.15)' },
+        // Subtle inset fill inside glass (chips, table header, stat tiles).
+        canvas: { DEFAULT: 'rgba(255,255,255,0.45)', dark: 'rgba(255,255,255,0.06)' },
+        // Bright glass rim and hairline dividers.
+        rim: { DEFAULT: 'rgba(255,255,255,0.9)', dark: 'rgba(255,255,255,0.16)' },
+        line: { DEFAULT: 'rgba(15,23,42,0.08)', dark: 'rgba(255,255,255,0.09)' },
+        ink: { DEFAULT: '#0B1020', dark: '#F4F6FF' },
+        muted: { DEFAULT: '#5A6378', dark: '#A7AFC6' },
+        brand: {
+          DEFAULT: '#4F46E5',
+          dark: '#A5B4FC',
+          soft: 'rgba(79,70,229,0.12)',
+          'soft-dark': 'rgba(165,180,252,0.16)',
+        },
         // Subscription colour only says over or under 1x (SPEC: Mobile app screens > UX rules).
-        over: { DEFAULT: '#067647', dark: '#47CD89', soft: '#E7F6EE', 'soft-dark': '#11291D' },
-        under: { DEFAULT: '#B54708', dark: '#FDB022', soft: '#FEF4E6', 'soft-dark': '#2E2110' },
-        loss: { DEFAULT: '#B42318', dark: '#F97066' },
+        over: { DEFAULT: '#067647', dark: '#5EE9A8', soft: 'rgba(6,118,71,0.12)', 'soft-dark': 'rgba(94,233,168,0.14)' },
+        under: { DEFAULT: '#B54708', dark: '#FDC35C', soft: 'rgba(181,71,8,0.12)', 'soft-dark': 'rgba(253,195,92,0.15)' },
+        loss: { DEFAULT: '#C4320A', dark: '#FF8A80' },
       },
       fontFamily: {
         sans: ['Inter_400Regular'],

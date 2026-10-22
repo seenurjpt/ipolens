@@ -5,6 +5,8 @@ import { Link, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { Glass } from '@/components/glass/glass';
+import { useContentInsets } from '@/components/glass/layout';
 import { RegistrarFrame } from '@/components/registrar-frame';
 import { Empty, ErrorState, Loading } from '@/components/screen-state';
 import { Button } from '@/components/ui/button';
@@ -22,13 +24,15 @@ export default function AllotmentScreen() {
 
   if (ipo.isPending || (ipo.data && registrar.isPending)) return <Loading />;
   if (ipo.isError) return <ErrorState message={ipo.error.message} onRetry={() => ipo.refetch()} />;
-  if (registrar.isError || !registrar.data) return <ErrorState message="Couldn't load the registrar's details." onRetry={() => registrar.refetch()} />;
+  if (registrar.isError || !registrar.data)
+    return <ErrorState message="Couldn't load the registrar's details." onRetry={() => registrar.refetch()} />;
   return <AllotmentFlow ipo={ipo.data.ipo} registrar={registrar.data.registrar} />;
 }
 
 type Registrar = NonNullable<ReturnType<typeof useRegistrar>['data']>['registrar'];
 
 function AllotmentFlow({ ipo, registrar }: { ipo: Ipo; registrar: Registrar }) {
+  const insets = useContentInsets();
   const pans = useAppStore((s) => s.pans);
   const applications = useAppStore((s) => s.applications);
   // Default to the first PAN that applied and has no result yet.
@@ -40,7 +44,10 @@ function AllotmentFlow({ ipo, registrar }: { ipo: Ipo; registrar: Registrar }) {
   if (pans.length === 0) {
     return (
       <View className="flex-1 justify-center gap-4 p-6">
-        <Empty title="Add a PAN first" note="Your PAN is filled into the registrar's page so you don't have to type it." />
+        <Empty
+          title="Add a PAN first"
+          note="Your PAN is filled into the registrar's page so you don't have to type it."
+        />
         <Link href="/pans/add" asChild>
           <Button label="Add a PAN" />
         </Link>
@@ -50,7 +57,7 @@ function AllotmentFlow({ ipo, registrar }: { ipo: Ipo; registrar: Registrar }) {
 
   if (!pan) {
     return (
-      <View className="flex-1 gap-5 p-4">
+      <View className="flex-1 gap-5 px-4" style={{ paddingTop: insets.top }}>
         <View className="gap-1">
           <Text variant="heading">{ipo.name}</Text>
           <Text variant="caption">Registrar: {registrar.name}</Text>
@@ -77,7 +84,7 @@ function AllotmentFlow({ ipo, registrar }: { ipo: Ipo; registrar: Registrar }) {
   }
 
   return (
-    <View className="flex-1">
+    <View className="flex-1" style={{ paddingTop: insets.top }}>
       <PanBar pan={pan} autoFilled={!!registrar.panFieldSelector} />
       <View className="flex-1">
         <RegistrarFrame
@@ -90,7 +97,7 @@ function AllotmentFlow({ ipo, registrar }: { ipo: Ipo; registrar: Registrar }) {
       {recording ? (
         <RecordResult ipo={ipo} panId={panId!} onDone={() => router.back()} onCancel={() => setRecording(false)} />
       ) : (
-        <View className="border-t border-line bg-surface p-3 dark:border-line-dark dark:bg-surface-dark">
+        <View className="px-4 pt-2" style={{ paddingBottom: insets.bottom - 8 }}>
           <Button label="I've seen my result" onPress={() => setRecording(true)} />
         </View>
       )}
@@ -103,7 +110,7 @@ function PanBar({ pan, autoFilled }: { pan: string; autoFilled: boolean }) {
   const palette = usePalette();
   const [copied, setCopied] = useState(false);
   return (
-    <View className="flex-row items-center gap-3 border-b border-line bg-brand-soft px-4 py-2.5 dark:border-line-dark dark:bg-brand-soft-dark">
+    <Glass className="mx-3 mb-2 flex-row items-center gap-3 px-4 py-2.5">
       <View className="flex-1">
         <Text variant="caption">{autoFilled ? 'PAN filled in' : 'Enter this PAN on the page'}</Text>
         <Text selectable className="font-sans-bold tracking-widest text-ink dark:text-ink-dark">
@@ -117,17 +124,29 @@ function PanBar({ pan, autoFilled }: { pan: string; autoFilled: boolean }) {
             await Clipboard.setStringAsync(pan);
             setCopied(true);
           }}
-          className="flex-row items-center gap-1.5 rounded-lg bg-surface px-3 py-2 active:opacity-70 dark:bg-surface-dark">
+          className="flex-row items-center gap-1.5 rounded-full border border-rim bg-strong px-3 py-2 active:opacity-70 dark:border-rim-dark dark:bg-strong-dark">
           <MaterialCommunityIcons name={copied ? 'check' : 'content-copy'} size={16} color={palette.brand} />
-          <Text className="font-sans-semibold text-xs text-brand dark:text-brand-dark">{copied ? 'Copied' : 'Copy'}</Text>
+          <Text className="font-sans-semibold text-xs text-brand dark:text-brand-dark">
+            {copied ? 'Copied' : 'Copy'}
+          </Text>
         </Pressable>
       ) : null}
-    </View>
+    </Glass>
   );
 }
 
 /** "Were you allotted?" — saves the answer against this PAN's application, creating it if needed. */
-function RecordResult({ ipo, panId, onDone, onCancel }: { ipo: Ipo; panId: string; onDone: () => void; onCancel: () => void }) {
+function RecordResult({
+  ipo,
+  panId,
+  onDone,
+  onCancel,
+}: {
+  ipo: Ipo;
+  panId: string;
+  onDone: () => void;
+  onCancel: () => void;
+}) {
   const [allotted, setAllotted] = useState<boolean | null>(null);
   const [lots, setLots] = useState(1);
 
@@ -146,11 +165,21 @@ function RecordResult({ ipo, panId, onDone, onCancel }: { ipo: Ipo; panId: strin
   };
 
   return (
-    <View className="gap-3 border-t border-line bg-surface p-4 dark:border-line-dark dark:bg-surface-dark">
+    <Glass className="m-3 gap-3 p-4">
       <Text variant="title">Were you allotted?</Text>
       <View className="flex-row gap-2">
-        <Button label="Yes" variant={allotted === true ? 'primary' : 'secondary'} className="flex-1" onPress={() => setAllotted(true)} />
-        <Button label="No" variant={allotted === false ? 'primary' : 'secondary'} className="flex-1" onPress={() => setAllotted(false)} />
+        <Button
+          label="Yes"
+          variant={allotted === true ? 'primary' : 'secondary'}
+          className="flex-1"
+          onPress={() => setAllotted(true)}
+        />
+        <Button
+          label="No"
+          variant={allotted === false ? 'primary' : 'secondary'}
+          className="flex-1"
+          onPress={() => setAllotted(false)}
+        />
       </View>
       {allotted ? (
         <View className="flex-row items-center justify-between">
@@ -162,6 +191,6 @@ function RecordResult({ ipo, panId, onDone, onCancel }: { ipo: Ipo; panId: strin
         <Button label="Back" variant="ghost" className="flex-1" onPress={onCancel} />
         <Button label="Save result" className="flex-1" disabled={allotted === null} onPress={save} />
       </View>
-    </View>
+    </Glass>
   );
 }

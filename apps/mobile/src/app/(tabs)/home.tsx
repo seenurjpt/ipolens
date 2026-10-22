@@ -5,6 +5,8 @@ import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 
 import { AllotmentBanner } from '@/components/allotment-banner';
 import { GainText, MultipleText } from '@/components/badges';
+import { Glass } from '@/components/glass/glass';
+import { useContentInsets } from '@/components/glass/layout';
 import { IpoCard } from '@/components/ipo-card';
 import { IpoLogo } from '@/components/ipo-logo';
 import { Empty, ErrorState, Loading } from '@/components/screen-state';
@@ -20,6 +22,7 @@ export default function HomeScreen() {
   const now = useNow();
   const open = useIpoList({ status: ['OPEN'], sort: 'closeAsc', pageSize: 50 });
   const listings = useRecentListings(5);
+  const insets = useContentInsets({ tabBar: true });
 
   if (open.isPending) return <Loading />;
   if (open.isError) return <ErrorState message={open.error.message} onRetry={() => open.refetch()} />;
@@ -35,7 +38,7 @@ export default function HomeScreen() {
     <FlashList
       data={items}
       keyExtractor={(i) => i._id}
-      contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top, paddingBottom: insets.bottom }}
       ItemSeparatorComponent={() => <View className="h-3" />}
       refreshControl={
         <RefreshControl
@@ -45,6 +48,7 @@ export default function HomeScreen() {
             listings.refetch();
           }}
           tintColor={palette.brand}
+          progressViewOffset={insets.top}
         />
       }
       ListHeaderComponent={
@@ -74,16 +78,20 @@ function ClosingToday({ items, now }: { items: IpoCardData[]; now: number }) {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
         {items.map((ipo) => (
           <Link key={ipo._id} href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
-            <Pressable className="w-44 gap-2 rounded-2xl bg-under-soft p-3 active:opacity-80 dark:bg-under-soft-dark">
-              <Text variant="label" numberOfLines={1}>
-                {ipo.name}
-              </Text>
-              <View className="flex-row items-center justify-between">
-                <Text className="font-sans-semibold text-xs text-under dark:text-under-dark">
-                  {formatCountdown(biddingEndsAt(ipo.dates.close!), 'Ends in', 'Closed', now)}
+            <Pressable className="active:opacity-80">
+              <Glass className="w-44 gap-2 p-3.5" radius={20}>
+                <Text variant="label" numberOfLines={1}>
+                  {ipo.name}
                 </Text>
-                {ipo.latestSubscription ? <MultipleText value={ipo.latestSubscription.total} className="text-xs" /> : null}
-              </View>
+                <View className="flex-row items-center justify-between">
+                  <Text className="font-sans-semibold text-xs text-under dark:text-under-dark">
+                    {formatCountdown(biddingEndsAt(ipo.dates.close!), 'Ends in', 'Closed', now)}
+                  </Text>
+                  {ipo.latestSubscription ? (
+                    <MultipleText value={ipo.latestSubscription.total} className="text-xs" />
+                  ) : null}
+                </View>
+              </Glass>
             </Pressable>
           </Link>
         ))}
@@ -98,7 +106,7 @@ function RecentListings({ query }: { query: ReturnType<typeof useRecentListings>
   return (
     <View className="gap-2 pt-7">
       <Text variant="heading">Recent listings</Text>
-      <View className="overflow-hidden rounded-2xl border border-line bg-surface dark:border-line-dark dark:bg-surface-dark">
+      <Glass>
         {items.map((ipo, idx) => (
           <Link key={ipo._id} href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
             <Pressable
@@ -114,7 +122,7 @@ function RecentListings({ query }: { query: ReturnType<typeof useRecentListings>
             </Pressable>
           </Link>
         ))}
-      </View>
+      </Glass>
     </View>
   );
 }

@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
+import { Glass } from '../glass/glass';
 import { Text } from './text';
 
-/** A titled white card used to group sections on detail screens. */
+/** A titled glass card used to group sections on detail screens. */
 export function Card({ title, right, children }: { title?: string; right?: ReactNode; children: ReactNode }) {
   return (
-    <View className="gap-3 rounded-2xl border border-line bg-surface p-4 dark:border-line-dark dark:bg-surface-dark">
+    <Glass className="gap-3 p-4">
       {title ? (
         <View className="flex-row items-center justify-between">
           <Text variant="title">{title}</Text>
@@ -14,7 +15,7 @@ export function Card({ title, right, children }: { title?: string; right?: React
         </View>
       ) : null}
       {children}
-    </View>
+    </Glass>
   );
 }
 

@@ -4,7 +4,10 @@ import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Glass } from '@/components/glass/glass';
+import { useContentInsets } from '@/components/glass/layout';
 import { BoardTag, GainText, StatusChip } from '@/components/badges';
 import { Disclaimer } from '@/components/disclaimer';
 import { IpoLogo } from '@/components/ipo-logo';
@@ -18,14 +21,7 @@ import { Card, Row } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { isStale, UpdatedAgo } from '@/components/updated-ago';
 import { useNow } from '@/hooks/use-now';
-import {
-  biddingEndsAt,
-  formatCountdown,
-  formatCrore,
-  formatDay,
-  formatPriceBand,
-  formatRupees,
-} from '@/lib/format';
+import { biddingEndsAt, formatCountdown, formatCrore, formatDay, formatPriceBand, formatRupees } from '@/lib/format';
 import { canCheckAllotment, canMarkApplied } from '@/lib/applications';
 import { useIpo, useReport, useSubscription } from '@/lib/queries';
 import { useAppStore } from '@/lib/store';
@@ -41,6 +37,7 @@ const TABS = [
 ] as const;
 
 export default function IpoDetailScreen() {
+  const insets = useContentInsets();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const palette = usePalette();
   const [tab, setTab] = useState<Tab>('overview');
@@ -54,8 +51,14 @@ export default function IpoDetailScreen() {
     <View className="flex-1">
       <Stack.Screen options={{ title: ipo.name, headerRight: () => <FollowButton slug={ipo.slug} /> }} />
       <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 16 }}
-        refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} tintColor={palette.brand} />}>
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top, paddingBottom: 16, gap: 16 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={query.isRefetching}
+            onRefresh={() => void query.refetch()}
+            tintColor={palette.brand}
+          />
+        }>
         <Header ipo={ipo} />
         <SegmentedControl options={TABS} value={tab} onChange={setTab} />
         {tab === 'overview' ? <Overview ipo={ipo} /> : null}
@@ -82,33 +85,40 @@ function FollowButton({ slug }: { slug: string }) {
       onPress={() => toggleFollow(slug)}
       hitSlop={10}
       className="px-3">
-      <MaterialCommunityIcons name={following ? 'bell-ring' : 'bell-outline'} size={22} color={following ? palette.brand : palette.ink} />
+      <MaterialCommunityIcons
+        name={following ? 'bell-ring' : 'bell-outline'}
+        size={22}
+        color={following ? palette.brand : palette.ink}
+      />
     </Pressable>
   );
 }
 
 /** Sticky "Mark as applied" + "Check allotment" (SPEC: Mobile app screens). */
 function ActionBar({ ipo }: { ipo: Ipo }) {
+  const { bottom } = useSafeAreaInsets();
   const appliedCount = useAppStore((s) => s.applications.filter((a) => a.ipoId === ipo._id).length);
   const showApply = canMarkApplied(ipo);
   const showCheck = canCheckAllotment(ipo);
   if (!showApply && !showCheck) return null;
   return (
-    <View className="flex-row gap-2 border-t border-line bg-surface px-4 py-3 dark:border-line-dark dark:bg-surface-dark">
-      {showApply ? (
-        <Link href={{ pathname: '/ipo/[slug]/apply', params: { slug: ipo.slug } }} asChild>
-          <Button
-            label={appliedCount ? `Applied · ${appliedCount} PAN${appliedCount > 1 ? 's' : ''}` : 'Mark as applied'}
-            variant={showCheck || appliedCount ? 'secondary' : 'primary'}
-            className="flex-1"
-          />
-        </Link>
-      ) : null}
-      {showCheck ? (
-        <Link href={{ pathname: '/allotment/[slug]', params: { slug: ipo.slug } }} asChild>
-          <Button label="Check allotment" className="flex-1" />
-        </Link>
-      ) : null}
+    <View className="px-4 pt-2" style={{ paddingBottom: bottom + 10 }}>
+      <Glass strong radius={32} className="flex-row gap-2 p-2">
+        {showApply ? (
+          <Link href={{ pathname: '/ipo/[slug]/apply', params: { slug: ipo.slug } }} asChild>
+            <Button
+              label={appliedCount ? `Applied · ${appliedCount} PAN${appliedCount > 1 ? 's' : ''}` : 'Mark as applied'}
+              variant={showCheck || appliedCount ? 'secondary' : 'primary'}
+              className="flex-1"
+            />
+          </Link>
+        ) : null}
+        {showCheck ? (
+          <Link href={{ pathname: '/allotment/[slug]', params: { slug: ipo.slug } }} asChild>
+            <Button label="Check allotment" className="flex-1" />
+          </Link>
+        ) : null}
+      </Glass>
     </View>
   );
 }
@@ -125,7 +135,7 @@ function Header({ ipo }: { ipo: Ipo }) {
         : null;
 
   return (
-    <View className="gap-4 rounded-2xl border border-line bg-surface p-4 dark:border-line-dark dark:bg-surface-dark">
+    <Glass className="gap-4 p-4">
       <View className="flex-row items-center gap-3">
         <IpoLogo name={ipo.name} logoUrl={ipo.logoUrl} size="lg" />
         <View className="flex-1 gap-1">
@@ -151,7 +161,7 @@ function Header({ ipo }: { ipo: Ipo }) {
         <Stat label="Min. investment" value={formatRupees(ipo.minInvestmentPaise)} />
         <Stat label="Issue size" value={formatCrore(ipo.issueSizePaise)} />
       </View>
-    </View>
+    </Glass>
   );
 }
 
@@ -209,7 +219,10 @@ function Overview({ ipo }: { ipo: Ipo }) {
         <Row label="Issue type" value={ipo.issueType === 'BOOK_BUILT' ? 'Book built' : 'Fixed price'} />
         <Row label="Fresh issue" value={formatCrore(ipo.freshIssuePaise)} />
         <Row label="Offer for sale" value={formatCrore(ipo.ofsPaise)} />
-        <Row label="Listing on" value={ipo.board === 'SME' ? `${ipo.exchanges.join(', ')} SME` : ipo.exchanges.join(', ')} />
+        <Row
+          label="Listing on"
+          value={ipo.board === 'SME' ? `${ipo.exchanges.join(', ')} SME` : ipo.exchanges.join(', ')}
+        />
         <Row label="Industry" value={ipo.industry} />
         <Row label="Registrar" value={ipo.registrar.name} />
         <Row label="Lead managers" value={ipo.leadManagers.join(', ')} />
@@ -218,7 +231,9 @@ function Overview({ ipo }: { ipo: Ipo }) {
         <Row label="QIB" value={`${r.qibPct}%`} />
         <Row label="NII (HNI)" value={`${r.niiPct}%`} />
         <Row label="Retail" value={`${r.retailPct}%`} />
-        {r.employeeQuota ? <Row label="Employee quota" value={`${r.employeeQuota.toLocaleString('en-IN')} shares`} /> : null}
+        {r.employeeQuota ? (
+          <Row label="Employee quota" value={`${r.employeeQuota.toLocaleString('en-IN')} shares`} />
+        ) : null}
       </Card>
     </View>
   );
@@ -236,7 +251,8 @@ function ListingCard({ ipo }: { ipo: Ipo }) {
       <Row
         label="Gain per lot at listing"
         value={
-          <Text className={`font-sans-semibold ${perLot >= 0 ? 'text-over dark:text-over-dark' : 'text-loss dark:text-loss-dark'}`}>
+          <Text
+            className={`font-sans-semibold ${perLot >= 0 ? 'text-over dark:text-over-dark' : 'text-loss dark:text-loss-dark'}`}>
             {perLot >= 0 ? '+' : '−'}
             {formatRupees(Math.abs(perLot))}
           </Text>
@@ -261,7 +277,9 @@ function SubscriptionTab({ ipo }: { ipo: Ipo }) {
     return (
       <Empty
         title="No bids yet"
-        note={ipo.dates.open ? `Live subscription starts when bidding opens on ${formatDay(ipo.dates.open)}.` : undefined}
+        note={
+          ipo.dates.open ? `Live subscription starts when bidding opens on ${formatDay(ipo.dates.open)}.` : undefined
+        }
       />
     );
   }
@@ -290,7 +308,9 @@ function AnalysisTab({ slug }: { slug: string }) {
   if (query.isPending) return <Loading />;
   if (query.isError) return <ErrorState message={query.error.message} onRetry={() => query.refetch()} />;
   if (!query.data) {
-    return <Empty title="Analysis in progress" note="We publish it once the RHP has been read and checked by a person." />;
+    return (
+      <Empty title="Analysis in progress" note="We publish it once the RHP has been read and checked by a person." />
+    );
   }
   const { report } = query.data;
   return (

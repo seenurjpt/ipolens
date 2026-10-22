@@ -5,6 +5,7 @@ import { Link, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, ScrollView, View } from 'react-native';
 
+import { useContentInsets } from '@/components/glass/layout';
 import { SegmentedControl } from '@/components/segmented-control';
 import { Button } from '@/components/ui/button';
 import { Card, Row } from '@/components/ui/card';
@@ -30,6 +31,7 @@ const THEMES = [
 ] as const;
 
 export default function SettingsScreen() {
+  const insets = useContentInsets({ tabBar: true });
   const pans = useAppStore((s) => s.pans);
   const alerts = useAppStore((s) => s.alerts);
   const setAlert = useAppStore((s) => s.setAlert);
@@ -37,7 +39,8 @@ export default function SettingsScreen() {
   const setTheme = useAppStore((s) => s.setTheme);
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top, paddingBottom: insets.bottom, gap: 16 }}>
       <Card title="Saved PANs">
         <Text variant="caption">Stored encrypted on this phone only. Used to fill the registrar&apos;s PAN box.</Text>
         {pans.map((p) => (
@@ -52,7 +55,13 @@ export default function SettingsScreen() {
       <Card title="Alerts">
         <Text variant="caption">Saved on this phone. Push alerts start once notifications are connected.</Text>
         {ALERTS.map((a) => (
-          <ToggleRow key={a.type} label={a.label} note={a.note} value={alerts[a.type]} onChange={(on) => setAlert(a.type, on)} />
+          <ToggleRow
+            key={a.type}
+            label={a.label}
+            note={a.note}
+            value={alerts[a.type]}
+            onChange={(on) => setAlert(a.type, on)}
+          />
         ))}
       </Card>
 
@@ -102,7 +111,7 @@ function PanRow({ pan }: { pan: SavedPan }) {
   };
 
   return (
-    <View className="gap-2 rounded-xl border border-line p-3 dark:border-line-dark">
+    <View className="gap-2 rounded-2xl border border-rim bg-canvas p-3 dark:border-rim-dark dark:bg-canvas-dark">
       <View className="flex-row items-center gap-3">
         <MaterialCommunityIcons name="card-account-details-outline" size={22} color={palette.brand} />
         <View className="flex-1">
@@ -112,7 +121,11 @@ function PanRow({ pan }: { pan: SavedPan }) {
           </Text>
         </View>
         {!confirming ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`Remove ${pan.label}`} onPress={() => setConfirming(true)} hitSlop={8}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Remove ${pan.label}`}
+            onPress={() => setConfirming(true)}
+            hitSlop={8}>
             <MaterialCommunityIcons name="trash-can-outline" size={20} color={palette.muted} />
           </Pressable>
         ) : null}

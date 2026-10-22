@@ -1,13 +1,14 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import * as Notifications from 'expo-notifications';
 import { Redirect } from 'expo-router';
 import { useState, type ComponentProps } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glass } from '@/components/glass/glass';
 import { PanForm } from '@/components/pan-form';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { requestNotificationPermission } from '@/lib/notifications';
 import { useAppStore } from '@/lib/store';
 import { usePalette } from '@/lib/theme';
 
@@ -44,20 +45,18 @@ export default function OnboardingScreen() {
 
   const askNotifications = async () => {
     try {
-      if (Platform.OS !== 'web') await Notifications.requestPermissionsAsync();
+      await requestNotificationPermission();
     } finally {
       setStep(PAN_STEP);
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
+    <SafeAreaView className="flex-1">
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, gap: 24 }} keyboardShouldPersistTaps="handled">
         <View className="flex-row items-center justify-between">
           <Text className="font-sans-bold text-lg">IPOLens</Text>
-          {step < PAN_STEP ? (
-            <Button label="Skip" variant="ghost" onPress={finish} />
-          ) : null}
+          {step < PAN_STEP ? <Button label="Skip" variant="ghost" onPress={finish} /> : null}
         </View>
 
         {step < NOTIFY_STEP ? (
@@ -112,9 +111,9 @@ function Slide({ icon, title, body }: { icon: Icon; title: string; body: string 
   const palette = usePalette();
   return (
     <View className="flex-1 items-center justify-center gap-5 py-8">
-      <View className="h-24 w-24 items-center justify-center rounded-3xl bg-brand-soft dark:bg-brand-soft-dark">
-        <MaterialCommunityIcons name={icon} size={44} color={palette.brand} />
-      </View>
+      <Glass radius={32} className="h-28 w-28 items-center justify-center">
+        <MaterialCommunityIcons name={icon} size={48} color={palette.brand} />
+      </Glass>
       <Text className="text-center font-sans-bold text-2xl">{title}</Text>
       <Text variant="caption" className="max-w-sm text-center text-base leading-6">
         {body}

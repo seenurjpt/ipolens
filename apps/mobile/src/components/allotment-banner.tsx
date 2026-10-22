@@ -6,8 +6,8 @@ import { Pressable, View } from 'react-native';
 import { awaitsAllotmentCheck } from '@/lib/applications';
 import { useIposBySlug } from '@/lib/queries';
 import { useAppStore } from '@/lib/store';
-import { usePalette, useResolvedScheme } from '@/lib/theme';
 
+import { HeroCard } from './glass/hero';
 import { Text } from './ui/text';
 
 /**
@@ -15,8 +15,6 @@ import { Text } from './ui/text';
  * the IPO's status, so it never says "pending" once allotment is done.
  */
 export function AllotmentBanner() {
-  const palette = usePalette();
-  const iconColor = useResolvedScheme() === 'dark' ? palette.brand : '#FFFFFF';
   const applications = useAppStore((s) => s.applications);
   const slugs = useMemo(
     () => [...new Set(applications.filter((a) => a.allotment === 'UNKNOWN').map((a) => a.slug))],
@@ -34,15 +32,15 @@ export function AllotmentBanner() {
     <View className="gap-2">
       {due.map((ipo) => (
         <Link key={ipo.slug} href={{ pathname: '/allotment/[slug]', params: { slug: ipo.slug } }} asChild>
-          <Pressable
-            accessibilityRole="link"
-            className="flex-row items-center gap-3 rounded-2xl bg-brand p-4 active:opacity-90 dark:bg-brand-soft-dark">
-            <MaterialCommunityIcons name="party-popper" size={24} color={iconColor} />
-            <View className="flex-1">
-              <Text className="font-sans-semibold text-white dark:text-ink-dark">Allotment is out</Text>
-              <Text className="text-xs text-white/85 dark:text-ink-dark/80">{ipo.name} · tap to check your PANs</Text>
-            </View>
-            <MaterialCommunityIcons name="chevron-right" size={22} color={iconColor} />
+          <Pressable accessibilityRole="link" className="active:opacity-90">
+            <HeroCard className="flex-row items-center gap-3 p-4">
+              <MaterialCommunityIcons name="party-popper" size={24} color="#FFFFFF" />
+              <View className="flex-1">
+                <Text className="font-sans-semibold text-white">Allotment is out</Text>
+                <Text className="text-xs text-white/85">{ipo.name} · tap to check your PANs</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={22} color="#FFFFFF" />
+            </HeroCard>
           </Pressable>
         </Link>
       ))}
