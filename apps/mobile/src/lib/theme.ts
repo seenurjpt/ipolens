@@ -6,10 +6,10 @@ import { useAppStore } from './store';
 // Keep in sync with tailwind.config.js.
 const palette = {
   light: {
-    base: '#EEF1FF',
-    surface: 'rgba(255,255,255,0.58)',
+    base: '#ECEFF7',
+    surface: 'rgba(255,255,255,0.55)',
     line: 'rgba(15,23,42,0.08)',
-    rim: 'rgba(255,255,255,0.9)',
+    rim: 'rgba(255,255,255,0.95)',
     ink: '#0B1020',
     muted: '#5A6378',
     brand: '#4F46E5',
@@ -19,10 +19,10 @@ const palette = {
     onBrand: '#FFFFFF',
   },
   dark: {
-    base: '#080B1E',
-    surface: 'rgba(255,255,255,0.075)',
+    base: '#04050D',
+    surface: 'rgba(255,255,255,0.10)',
     line: 'rgba(255,255,255,0.09)',
-    rim: 'rgba(255,255,255,0.16)',
+    rim: 'rgba(255,255,255,0.22)',
     ink: '#F4F6FF',
     muted: '#A7AFC6',
     brand: '#A5B4FC',
@@ -47,22 +47,30 @@ export function usePalette(): Palette {
   return palette[useResolvedScheme()];
 }
 
-/** Backdrop gradient and the coloured glows that show through the glass. */
+/**
+ * Aurora backdrop: wide glowing ribbons of blue, cyan and violet across the top, fading into a clean
+ * base, with a faint glow at the bottom for depth. Each ribbon is an elliptical radial gradient;
+ * cx/cy/rx/ry are fractions of the screen (rx of its width, ry of its height).
+ */
 export const BACKDROP = {
   light: {
-    gradient: ['#E8ECFF', '#F3EEFF', '#E7F6FB'] as const,
+    gradient: ['#E6ECFB', '#EEF0F8', '#ECEFF7'] as const,
     glows: [
-      { color: '#818CF8', opacity: 0.45, cx: '8%', cy: '6%', r: '55%' },
-      { color: '#F0ABFC', opacity: 0.35, cx: '100%', cy: '42%', r: '50%' },
-      { color: '#67E8F9', opacity: 0.35, cx: '0%', cy: '92%', r: '55%' },
+      { color: '#3B82F6', opacity: 0.42, cx: '28%', cy: '-3%', rx: '80%', ry: '20%' },
+      { color: '#22D3EE', opacity: 0.38, cx: '6%', cy: '12%', rx: '60%', ry: '12%' },
+      { color: '#8B5CF6', opacity: 0.4, cx: '90%', cy: '7%', rx: '62%', ry: '16%' },
+      { color: '#F0ABFC', opacity: 0.26, cx: '62%', cy: '24%', rx: '58%', ry: '9%' },
+      { color: '#A5B4FC', opacity: 0.3, cx: '50%', cy: '106%', rx: '85%', ry: '22%' },
     ],
   },
   dark: {
-    gradient: ['#080B1E', '#120B2E', '#05141F'] as const,
+    gradient: ['#0A0F26', '#05060F', '#04050D'] as const,
     glows: [
-      { color: '#6366F1', opacity: 0.5, cx: '8%', cy: '6%', r: '55%' },
-      { color: '#C026D3', opacity: 0.32, cx: '100%', cy: '42%', r: '50%' },
-      { color: '#06B6D4', opacity: 0.3, cx: '0%', cy: '92%', r: '55%' },
+      { color: '#2563EB', opacity: 0.8, cx: '28%', cy: '-3%', rx: '80%', ry: '20%' },
+      { color: '#06B6D4', opacity: 0.6, cx: '6%', cy: '12%', rx: '60%', ry: '12%' },
+      { color: '#8B5CF6', opacity: 0.7, cx: '90%', cy: '7%', rx: '62%', ry: '16%' },
+      { color: '#D946EF', opacity: 0.32, cx: '62%', cy: '24%', rx: '58%', ry: '9%' },
+      { color: '#4338CA', opacity: 0.35, cx: '50%', cy: '106%', rx: '85%', ry: '22%' },
     ],
   },
 } as const;

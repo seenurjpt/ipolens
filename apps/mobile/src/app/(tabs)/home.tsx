@@ -14,7 +14,7 @@ import { Text } from '@/components/ui/text';
 import { UpdatedAgo } from '@/components/updated-ago';
 import { useNow } from '@/hooks/use-now';
 import { biddingEndsAt, formatCountdown, formatDay, isSameIstDay } from '@/lib/format';
-import { useIpoList, useRecentListings } from '@/lib/queries';
+import { useIpoList, usePrefetchIpo, useRecentListings } from '@/lib/queries';
 import { usePalette } from '@/lib/theme';
 
 export default function HomeScreen() {
@@ -72,13 +72,14 @@ export default function HomeScreen() {
 }
 
 function ClosingToday({ items, now }: { items: IpoCardData[]; now: number }) {
+  const prefetch = usePrefetchIpo();
   return (
     <View className="gap-2">
       <Text variant="title">Closing today</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
         {items.map((ipo) => (
           <Link key={ipo._id} href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
-            <Pressable className="active:opacity-80">
+            <Pressable onPressIn={() => prefetch(ipo.slug)} className="active:opacity-80">
               <Glass className="w-44 gap-2 p-3.5" radius={20}>
                 <Text variant="label" numberOfLines={1}>
                   {ipo.name}
@@ -101,6 +102,7 @@ function ClosingToday({ items, now }: { items: IpoCardData[]; now: number }) {
 }
 
 function RecentListings({ query }: { query: ReturnType<typeof useRecentListings> }) {
+  const prefetch = usePrefetchIpo();
   const items = query.data?.items ?? [];
   if (items.length === 0) return null;
   return (
@@ -110,6 +112,7 @@ function RecentListings({ query }: { query: ReturnType<typeof useRecentListings>
         {items.map((ipo, idx) => (
           <Link key={ipo._id} href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
             <Pressable
+              onPressIn={() => prefetch(ipo.slug)}
               className={`flex-row items-center gap-3 px-4 py-3 active:opacity-70 ${idx > 0 ? 'border-t border-line dark:border-line-dark' : ''}`}>
               <IpoLogo name={ipo.name} logoUrl={ipo.logoUrl} />
               <View className="flex-1">

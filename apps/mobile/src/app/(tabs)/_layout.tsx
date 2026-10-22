@@ -24,6 +24,12 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: 'Inter_700Bold', fontSize: 26, color: palette.ink },
             headerTitleAlign: 'left',
             sceneStyle: { backgroundColor: 'transparent' },
+            // Smooth tab switches: a short crossfade, all tabs mounted up front so a switch never
+            // waits for a first render, and hidden tabs frozen so they don't re-render in the background.
+            animation: 'fade',
+            transitionSpec: { animation: 'timing', config: { duration: 200 } },
+            lazy: false,
+            freezeOnBlur: true,
           }}>
           <Tabs.Screen name="home" options={{ title: 'IPOLens' }} />
           <Tabs.Screen name="ipos" options={{ title: 'Explore' }} />

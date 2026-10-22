@@ -86,6 +86,8 @@ export default function ExploreScreen() {
       ) : (
         <FlashList
           data={items}
+          // Dim the previous results while a new tab or filter loads, instead of flashing a spinner.
+          style={{ opacity: query.isPlaceholderData ? 0.55 : 1 }}
           keyExtractor={(i) => i._id}
           renderItem={({ item }) => <IpoCard ipo={item} now={now.getTime()} />}
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom }}

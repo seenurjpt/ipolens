@@ -3,6 +3,7 @@ import { Link } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { biddingEndsAt, formatCountdown, formatDay, formatPriceBand, formatRupees } from '@/lib/format';
+import { usePrefetchIpo } from '@/lib/queries';
 
 import { BoardTag, GainText, MultipleText, StatusChip } from './badges';
 import { Glass } from './glass/glass';
@@ -51,9 +52,10 @@ function Headline({ ipo }: { ipo: IpoCardData }) {
 }
 
 export function IpoCard({ ipo, now }: { ipo: IpoCardData; now: number }) {
+  const prefetch = usePrefetchIpo();
   return (
     <Link href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
-      <Pressable accessibilityRole="link" className="active:opacity-80">
+      <Pressable accessibilityRole="link" onPressIn={() => prefetch(ipo.slug)} className="active:opacity-80">
         <Glass className="p-4">
           <View className="flex-row items-center gap-3">
             <IpoLogo name={ipo.name} logoUrl={ipo.logoUrl} />

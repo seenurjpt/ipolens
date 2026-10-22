@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { allottedShares, awaitsAllotmentCheck, CATEGORY_LABELS, listingPnlPaise } from '@/lib/applications';
 import { formatDay, formatRupees } from '@/lib/format';
-import { useIposBySlug } from '@/lib/queries';
+import { useIposBySlug, usePrefetchIpo } from '@/lib/queries';
 import { useAppStore, type Application } from '@/lib/store';
 import { usePalette } from '@/lib/theme';
 
@@ -95,11 +95,12 @@ export default function MyIposScreen() {
 }
 
 function AppliedIpoCard({ ipo, apps, panLabel }: { ipo: Ipo; apps: Application[]; panLabel: Map<string, string> }) {
+  const prefetch = usePrefetchIpo();
   const needsCheck = apps.some((a) => awaitsAllotmentCheck(a, ipo));
   return (
     <Glass className="gap-3 p-4">
       <Link href={{ pathname: '/ipo/[slug]', params: { slug: ipo.slug } }} asChild>
-        <Pressable className="flex-row items-center gap-3 active:opacity-70">
+        <Pressable onPressIn={() => prefetch(ipo.slug)} className="flex-row items-center gap-3 active:opacity-70">
           <IpoLogo name={ipo.name} logoUrl={ipo.logoUrl} />
           <View className="flex-1 gap-1">
             <Text variant="title" numberOfLines={1}>

@@ -11,14 +11,14 @@ module.exports = {
       // Keep in sync with src/lib/theme.ts.
       colors: {
         // Solid backdrop base, for navigation containers and transitions.
-        base: { DEFAULT: '#EEF1FF', dark: '#080B1E' },
+        base: { DEFAULT: '#ECEFF7', dark: '#04050D' },
         // Glass panels (cards) and stronger glass (inputs, controls, selected pills).
-        surface: { DEFAULT: 'rgba(255,255,255,0.58)', dark: 'rgba(255,255,255,0.075)' },
-        strong: { DEFAULT: 'rgba(255,255,255,0.82)', dark: 'rgba(255,255,255,0.15)' },
+        surface: { DEFAULT: 'rgba(255,255,255,0.55)', dark: 'rgba(255,255,255,0.10)' },
+        strong: { DEFAULT: 'rgba(255,255,255,0.8)', dark: 'rgba(255,255,255,0.18)' },
         // Subtle inset fill inside glass (chips, table header, stat tiles).
-        canvas: { DEFAULT: 'rgba(255,255,255,0.45)', dark: 'rgba(255,255,255,0.06)' },
+        canvas: { DEFAULT: 'rgba(255,255,255,0.36)', dark: 'rgba(255,255,255,0.07)' },
         // Bright glass rim and hairline dividers.
-        rim: { DEFAULT: 'rgba(255,255,255,0.9)', dark: 'rgba(255,255,255,0.16)' },
+        rim: { DEFAULT: 'rgba(255,255,255,0.95)', dark: 'rgba(255,255,255,0.22)' },
         line: { DEFAULT: 'rgba(15,23,42,0.08)', dark: 'rgba(255,255,255,0.09)' },
         ink: { DEFAULT: '#0B1020', dark: '#F4F6FF' },
         muted: { DEFAULT: '#5A6378', dark: '#A7AFC6' },

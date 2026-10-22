@@ -33,6 +33,8 @@ export function ToggleRow({
         disabled={disabled}
         trackColor={{ true: palette.brand, false: palette.line }}
         thumbColor="#FFFFFF"
+        // react-native-web colours the "on" knob teal unless told otherwise (prop is web-only).
+        {...({ activeThumbColor: '#FFFFFF' } as object)}
       />
     </View>
   );

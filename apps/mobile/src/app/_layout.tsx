@@ -12,7 +12,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { colorScheme } from 'nativewind';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { Platform, View } from 'react-native';
 
 import { Backdrop } from '@/components/glass/backdrop';
@@ -31,9 +31,12 @@ export default function RootLayout() {
   const palette = usePalette();
   const ready = (fontsLoaded || !!fontError) && hydrated;
 
-  // darkMode is 'class' (tailwind.config.js). On native NativeWind applies the preference itself;
-  // on web its dark: styles are plain CSS keyed on a .dark class on <html>.
-  useEffect(() => {
+  // darkMode is 'class' (tailwind.config.js). On native, colorScheme.set() sets the app's
+  // Appearance, which both NativeWind's dark: classes and useColorScheme (palette, backdrop,
+  // tab bar) read, so the two always agree. Pass the preference, not the resolved scheme:
+  // 'system' must stay 'system' so the app keeps following the device.
+  // On web the dark: styles are plain CSS keyed on a .dark class on <html>.
+  useLayoutEffect(() => {
     if (Platform.OS === 'web') document.documentElement.classList.toggle('dark', scheme === 'dark');
     else colorScheme.set(preference);
   }, [preference, scheme]);

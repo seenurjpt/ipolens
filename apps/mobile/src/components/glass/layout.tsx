@@ -1,16 +1,16 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useHeaderHeight } from 'expo-router/react-navigation';
-import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Palette } from '@/lib/theme';
+
+import { HeaderBackdrop } from './backdrop';
 
 export const TAB_BAR_HEIGHT = 64;
 const TAB_BAR_GAP = 10;
 
 /**
- * Headers float over the content: transparent, with a fade from the backdrop colour so text
- * scrolling underneath stays legible (like iOS's scroll-edge effect).
+ * Headers float over the content and draw the same aurora as the screen behind them, so scrolled
+ * content slips under the title without a visible band.
  */
 export function glassHeaderOptions(palette: Palette) {
   return {
@@ -18,18 +18,8 @@ export function glassHeaderOptions(palette: Palette) {
     headerShadowVisible: false,
     headerTintColor: palette.ink,
     headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: palette.ink },
-    headerBackground: () => <HeaderFade color={palette.base} />,
+    headerBackground: () => <HeaderBackdrop />,
   } as const;
-}
-
-function HeaderFade({ color }: { color: string }) {
-  return (
-    <LinearGradient
-      colors={[color, `${color}E6`, `${color}00`]}
-      locations={[0, 0.6, 1]}
-      style={StyleSheet.absoluteFill}
-    />
-  );
 }
 
 /** Where the floating tab bar sits, from the bottom of the screen. */

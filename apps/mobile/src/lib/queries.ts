@@ -10,7 +10,8 @@ import {
   type IpoStatus,
   type RegistrarCode,
 } from '@ipolens/shared';
-import { useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { ApiError, apiGet } from './api';
 
 const LIVE_REFETCH_MS = 60_000;
@@ -34,6 +35,7 @@ export function useIpoList(params: IpoListParams) {
   return useQuery({
     queryKey: ['ipos', params],
     queryFn: () => apiGet('/v1/ipos', IpoListResponse, listQuery(params, 1)),
+    placeholderData: keepPreviousData,
     refetchInterval: (q) => (q.state.data?.items.some((i) => i.status === 'OPEN') ? LIVE_REFETCH_MS : false),
   });
 }
@@ -45,6 +47,7 @@ export function useIpoPages(params: IpoListParams) {
     queryFn: ({ pageParam }) => apiGet('/v1/ipos', IpoListResponse, listQuery(params, pageParam)),
     initialPageParam: 1,
     getNextPageParam: (last) => (last.page * last.pageSize < last.total ? last.page + 1 : undefined),
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -55,6 +58,15 @@ const ipoQuery = (slug: string) => ({
 
 export function useIpo(slug: string) {
   return useQuery(ipoQuery(slug));
+}
+
+/**
+ * Starts loading an IPO's detail when a finger touches its card, so the data is usually there
+ * by the time the next screen has faded in.
+ */
+export function usePrefetchIpo() {
+  const client = useQueryClient();
+  return useCallback((slug: string) => void client.prefetchQuery({ ...ipoQuery(slug), staleTime: 60_000 }), [client]);
 }
 
 /** Details of several IPOs at once (e.g. every IPO the user applied for), keyed by slug. */

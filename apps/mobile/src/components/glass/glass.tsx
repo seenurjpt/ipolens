@@ -1,12 +1,14 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { View, type ViewProps } from 'react-native';
+import { StyleSheet, View, type ViewProps } from 'react-native';
 
 import { useResolvedScheme } from '@/lib/theme';
 
+// Light catching the glass: a diagonal sheen from the top-left and a crisp highlight on the top edge.
 const SHEEN = {
-  light: ['rgba(255,255,255,0.75)', 'rgba(255,255,255,0)'] as const,
-  dark: ['rgba(255,255,255,0.12)', 'rgba(255,255,255,0)'] as const,
+  light: ['rgba(255,255,255,0.85)', 'rgba(255,255,255,0.25)', 'rgba(255,255,255,0)'] as const,
+  dark: ['rgba(255,255,255,0.20)', 'rgba(255,255,255,0.05)', 'rgba(255,255,255,0)'] as const,
 };
+const EDGE = { light: 'rgba(255,255,255,1)', dark: 'rgba(255,255,255,0.45)' };
 
 export interface GlassProps extends ViewProps {
   className?: string;
@@ -17,8 +19,8 @@ export interface GlassProps extends ViewProps {
 }
 
 /**
- * A translucent glass panel: frosted fill, bright rim and a soft top sheen. It doesn't blur —
- * over the static gradient backdrop a blur would look identical but cost a lot on Android.
+ * A translucent glass panel: frosted fill, bright rim, diagonal sheen and a lit top edge. It doesn't
+ * blur — over the static gradient backdrop a blur would look the same but cost a lot on Android.
  * Real blur is used only where content scrolls underneath (the floating tab bar).
  */
 export function Glass({ className = '', radius = 24, strong = false, style, children, ...props }: GlassProps) {
@@ -31,9 +33,20 @@ export function Glass({ className = '', radius = 24, strong = false, style, chil
       <LinearGradient
         pointerEvents="none"
         colors={SHEEN[scheme]}
-        style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '55%' }}
+        locations={[0, 0.35, 0.7]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.8, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <View
+        pointerEvents="none"
+        style={[styles.edge, { left: radius * 0.6, right: radius * 0.6, backgroundColor: EDGE[scheme] }]}
       />
       {children}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  edge: { position: 'absolute', top: 0, height: StyleSheet.hairlineWidth * 2, opacity: 0.9 },
+});
