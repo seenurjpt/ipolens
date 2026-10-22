@@ -15,7 +15,8 @@
     "test": "turbo run test",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
-    "db:seed": "pnpm --filter @ipolens/api seed"
+    "db:seed": "pnpm --filter @ipolens/api seed",
+    "dev:web": "turbo run dev --filter=@ipolens/web"
   },
   "devDependencies": {
     "turbo": "^2.5.0",
