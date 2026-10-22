@@ -3,6 +3,7 @@ import { FlashList } from '@shopify/flash-list';
 import { Link } from 'expo-router';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 
+import { AllotmentBanner } from '@/components/allotment-banner';
 import { GainText, MultipleText } from '@/components/badges';
 import { IpoCard } from '@/components/ipo-card';
 import { IpoLogo } from '@/components/ipo-logo';
@@ -48,6 +49,7 @@ export default function HomeScreen() {
       }
       ListHeaderComponent={
         <View className="gap-5 pb-3 pt-2">
+          <AllotmentBanner />
           {closingToday.length > 0 ? <ClosingToday items={closingToday} now={now.getTime()} /> : null}
           <View className="flex-row items-end justify-between">
             <View>

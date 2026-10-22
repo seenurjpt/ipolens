@@ -7,6 +7,8 @@ export * from './schemas/ipo';
 export * from './schemas/ai-report';
 export * from './schemas/user';
 export * from './api';
+export * from './jobs';
+export * from './admin';
 
 /** Redis key holding the latest subscription snapshot (JSON SubscriptionFigures) of an IPO. */
 export const subscriptionCacheKey = (ipoId: string) => `sub:${ipoId}`;

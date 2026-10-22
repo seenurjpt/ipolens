@@ -1,5 +1,7 @@
 import { useColorScheme } from 'react-native';
 
+import { useAppStore } from './store';
+
 // Raw colour values for places className cannot reach (navigation, charts, icons).
 // Keep in sync with tailwind.config.js.
 const palette = {
@@ -29,8 +31,16 @@ const palette = {
 
 export type Palette = Record<keyof (typeof palette)['light'], string>;
 
+/** The theme in effect: the user's choice in Settings, or the device theme. */
+export function useResolvedScheme(): 'light' | 'dark' {
+  const device = useColorScheme();
+  const preference = useAppStore((s) => s.theme);
+  if (preference !== 'system') return preference;
+  return device === 'dark' ? 'dark' : 'light';
+}
+
 export function usePalette(): Palette {
-  return palette[useColorScheme() === 'dark' ? 'dark' : 'light'];
+  return palette[useResolvedScheme()];
 }
 
 // One colour per category line in the subscription chart.

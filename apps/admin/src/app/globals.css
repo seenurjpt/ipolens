@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
+/* Same palette as the mobile app (apps/mobile/tailwind.config.js). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --c-canvas: #f4f5f7;
+  --c-surface: #ffffff;
+  --c-line: #e4e7ec;
+  --c-ink: #101828;
+  --c-muted: #667085;
+  --c-brand: #3355e0;
+  --c-brand-soft: #ebeffd;
+  --c-over: #067647;
+  --c-over-soft: #e7f6ee;
+  --c-under: #b54708;
+  --c-under-soft: #fef4e6;
+  --c-loss: #b42318;
+  --c-loss-soft: #fef3f2;
+  --c-on-brand: #ffffff;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --c-canvas: #0b0d10;
+    --c-surface: #15181d;
+    --c-line: #262a31;
+    --c-ink: #eceef1;
+    --c-muted: #98a2b3;
+    --c-brand: #7b93ff;
+    --c-brand-soft: #1c2445;
+    --c-over: #47cd89;
+    --c-over-soft: #11291d;
+    --c-under: #fdb022;
+    --c-under-soft: #2e2110;
+    --c-loss: #f97066;
+    --c-loss-soft: #2d1513;
+    --c-on-brand: #0b0d10;
+    color-scheme: dark;
   }
 }
 
+@theme inline {
+  --color-canvas: var(--c-canvas);
+  --color-surface: var(--c-surface);
+  --color-line: var(--c-line);
+  --color-ink: var(--c-ink);
+  --color-muted: var(--c-muted);
+  --color-brand: var(--c-brand);
+  --color-brand-soft: var(--c-brand-soft);
+  --color-over: var(--c-over);
+  --color-over-soft: var(--c-over-soft);
+  --color-under: var(--c-under);
+  --color-under-soft: var(--c-under-soft);
+  --color-loss: var(--c-loss);
+  --color-loss-soft: var(--c-loss-soft);
+  --color-on-brand: var(--c-on-brand);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--c-canvas);
+  color: var(--c-ink);
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+
+/* One visible focus style for every interactive element. */
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--c-brand);
+  outline-offset: 2px;
+  border-radius: 6px;
 }

@@ -12,6 +12,8 @@ import { env } from './env';
 import { HttpError, RATE_LIMITS } from './lib/http';
 import { redactLogLine } from './lib/redact';
 import { v1Routes } from './routes';
+import { adminRoutes } from './routes/admin';
+import type { JobQueue } from './services/job-queue';
 import { noSubscriptionCache, type SubscriptionCache } from './services/subscription-cache';
 
 export interface AppOptions {
@@ -21,6 +23,10 @@ export interface AppOptions {
   /** Shares rate-limit counters across API instances. In-memory when omitted. */
   redis?: Redis;
   rateLimitMax?: number;
+  /** Admin bearer token; defaults to ADMIN_API_TOKEN. null disables the admin API. */
+  adminToken?: string | null;
+  /** Queue for admin job triggers. Job routes answer 503 without one. */
+  jobQueue?: JobQueue;
 }
 
 export function buildApp(opts: AppOptions = {}) {
@@ -79,6 +85,11 @@ export function buildApp(opts: AppOptions = {}) {
   app.get('/health', async () => ({ ok: true, asOf: new Date().toISOString() }));
 
   app.register(v1Routes, { prefix: '/v1', subscriptionCache: opts.subscriptionCache ?? noSubscriptionCache });
+  app.register(adminRoutes, {
+    prefix: '/v1/admin',
+    adminToken: opts.adminToken === undefined ? env.ADMIN_API_TOKEN : (opts.adminToken ?? undefined),
+    jobQueue: opts.jobQueue,
+  });
 
   return app;
 }

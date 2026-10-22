@@ -13,6 +13,7 @@ import { Empty, ErrorState, Loading } from '@/components/screen-state';
 import { SegmentedControl } from '@/components/segmented-control';
 import { SubscriptionChart } from '@/components/subscription-chart';
 import { SubscriptionTable } from '@/components/subscription-table';
+import { Button } from '@/components/ui/button';
 import { Card, Row } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { isStale, UpdatedAgo } from '@/components/updated-ago';
@@ -25,7 +26,9 @@ import {
   formatPriceBand,
   formatRupees,
 } from '@/lib/format';
+import { canCheckAllotment, canMarkApplied } from '@/lib/applications';
 import { useIpo, useReport, useSubscription } from '@/lib/queries';
+import { useAppStore } from '@/lib/store';
 import { usePalette } from '@/lib/theme';
 
 type Tab = 'overview' | 'subscription' | 'analysis' | 'documents';
@@ -48,8 +51,8 @@ export default function IpoDetailScreen() {
   const { ipo } = query.data;
 
   return (
-    <>
-      <Stack.Screen options={{ title: ipo.name }} />
+    <View className="flex-1">
+      <Stack.Screen options={{ title: ipo.name, headerRight: () => <FollowButton slug={ipo.slug} /> }} />
       <ScrollView
         contentContainerStyle={{ padding: 16, gap: 16 }}
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} tintColor={palette.brand} />}>
@@ -61,7 +64,52 @@ export default function IpoDetailScreen() {
         {tab === 'documents' ? <DocumentsTab ipo={ipo} /> : null}
         <Disclaimer />
       </ScrollView>
-    </>
+      <ActionBar ipo={ipo} />
+    </View>
+  );
+}
+
+/** Bell in the header: follow this IPO for its alerts. */
+function FollowButton({ slug }: { slug: string }) {
+  const palette = usePalette();
+  const following = useAppStore((s) => s.followed.includes(slug));
+  const toggleFollow = useAppStore((s) => s.toggleFollow);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={following ? 'Stop following this IPO' : 'Follow this IPO for alerts'}
+      accessibilityState={{ selected: following }}
+      onPress={() => toggleFollow(slug)}
+      hitSlop={10}
+      className="px-3">
+      <MaterialCommunityIcons name={following ? 'bell-ring' : 'bell-outline'} size={22} color={following ? palette.brand : palette.ink} />
+    </Pressable>
+  );
+}
+
+/** Sticky "Mark as applied" + "Check allotment" (SPEC: Mobile app screens). */
+function ActionBar({ ipo }: { ipo: Ipo }) {
+  const appliedCount = useAppStore((s) => s.applications.filter((a) => a.ipoId === ipo._id).length);
+  const showApply = canMarkApplied(ipo);
+  const showCheck = canCheckAllotment(ipo);
+  if (!showApply && !showCheck) return null;
+  return (
+    <View className="flex-row gap-2 border-t border-line bg-surface px-4 py-3 dark:border-line-dark dark:bg-surface-dark">
+      {showApply ? (
+        <Link href={{ pathname: '/ipo/[slug]/apply', params: { slug: ipo.slug } }} asChild>
+          <Button
+            label={appliedCount ? `Applied · ${appliedCount} PAN${appliedCount > 1 ? 's' : ''}` : 'Mark as applied'}
+            variant={showCheck || appliedCount ? 'secondary' : 'primary'}
+            className="flex-1"
+          />
+        </Link>
+      ) : null}
+      {showCheck ? (
+        <Link href={{ pathname: '/allotment/[slug]', params: { slug: ipo.slug } }} asChild>
+          <Button label="Check allotment" className="flex-1" />
+        </Link>
+      ) : null}
+    </View>
   );
 }
 

@@ -2,7 +2,9 @@
   "name": "ipolens",
   "private": true,
   "packageManager": "pnpm@9.15.9",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "turbo run dev --filter=@ipolens/api --filter=@ipolens/worker --filter=@ipolens/mobile",
     "dev:admin": "turbo run dev --filter=@ipolens/admin",
@@ -18,5 +20,12 @@
   "devDependencies": {
     "turbo": "^2.5.0",
     "typescript": "^5.8.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@expo/dom-webview": "~57.0.1",
+      "@expo/log-box": "~57.0.4",
+      "@react-native/metro-config": "0.86.3"
+    }
   }
 }
