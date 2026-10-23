@@ -13,4 +13,5 @@ const EnvSchema = z.object({
     .transform((v) => v || undefined), // an empty value in .env counts as unset
 });
 
-export const env = EnvSchema.parse(process.env);
+// Hosts like Render and Railway pass the port as PORT.
+export const env = EnvSchema.parse({ ...process.env, API_PORT: process.env.API_PORT ?? process.env.PORT });
