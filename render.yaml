@@ -6,7 +6,7 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: corepack enable && pnpm install --frozen-lockfile --filter "@ipolens/api..." && pnpm --filter @ipolens/api build
+    buildCommand: corepack enable && pnpm install --frozen-lockfile --prod=false --filter "@ipolens/api..." && pnpm --filter @ipolens/api build
     startCommand: pnpm --filter @ipolens/api start
     healthCheckPath: /health
     envVars:
