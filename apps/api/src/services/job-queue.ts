@@ -26,7 +26,8 @@ export function bullJobQueue(redisUrl: string): JobQueue {
   const connection = new Redis(redisUrl, {
     enableOfflineQueue: false,
     maxRetriesPerRequest: 1,
-    connectTimeout: 2_000,
+    // A hosted Redis (TLS, possibly in another region) can take more than 2s to connect.
+    connectTimeout: 5_000,
   });
   connection.on('error', () => {
     // Reported per request as QueueUnavailableError; ioredis keeps reconnecting.
@@ -36,18 +37,32 @@ export function bullJobQueue(redisUrl: string): JobQueue {
     // Same as above: without a listener an emitted error would crash the process.
   });
 
-  const ensureReady = () => {
-    if (connection.status !== 'ready') throw new QueueUnavailableError();
+  // Right after a (cold) start the connection may still be coming up, so give it a moment
+  // before reporting the queue as unavailable.
+  const ensureReady = async () => {
+    if (connection.status === 'ready') return;
+    if (connection.status === 'end') throw new QueueUnavailableError();
+    const ready = await new Promise<boolean>((resolve) => {
+      const done = (ok: boolean) => {
+        clearTimeout(timer);
+        connection.off('ready', onReady);
+        resolve(ok);
+      };
+      const onReady = () => done(true);
+      const timer = setTimeout(() => done(false), 5_000);
+      connection.once('ready', onReady);
+    });
+    if (!ready) throw new QueueUnavailableError();
   };
 
   return {
     async add(name, data) {
-      ensureReady();
+      await ensureReady();
       const job = await queue.add(name, data, { removeOnComplete: 500, removeOnFail: 1000 });
       return job.id ?? '';
     },
     async recent(limit) {
-      ensureReady();
+      await ensureReady();
       const [counts, jobs] = await Promise.all([queue.getJobCounts(...STATES), queue.getJobs([...STATES], 0, limit - 1)]);
       const runs = await Promise.all(
         jobs
